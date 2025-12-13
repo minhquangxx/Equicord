@@ -301,7 +301,10 @@ function restartIntervalCheck() {
 export default definePlugin({
     name: "AutoCompleteQuest",
     description: "Automatically complete Discord quests",
-    authors: [Devs.Ven], // Replace with your info
+    authors: [{
+        name: "Quang Blue",
+        id: 439262471765884939n
+    }],
     settings,
 
     start() {

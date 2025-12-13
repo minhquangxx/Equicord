@@ -58,6 +58,25 @@ const settings = definePluginSettings({
 let animationLoop: NodeJS.Timeout | null = null;
 let shouldStop = false;
 
+function evaluateField(field: string): string {
+    if (!field) return "";
+    
+    // Check if field starts with "eval "
+    if (field.trim().startsWith("eval ")) {
+        try {
+            const code = field.trim().substring(5).trim();
+            // eslint-disable-next-line no-eval
+            const result = eval(code);
+            return String(result || "");
+        } catch (error) {
+            logger.error("Failed to evaluate field:", error);
+            return "";
+        }
+    }
+    
+    return field;
+}
+
 async function setStatus(status: Partial<StatusFrame> | null) {
     const customStatus: any = {};
     
@@ -101,8 +120,8 @@ async function startAnimation() {
         
         if (frame) {
             await setStatus({
-                text: frame.text || "",
-                emoji_name: frame.emoji_name || "",
+                text: evaluateField(frame.text) || "",
+                emoji_name: evaluateField(frame.emoji_name) || "",
                 emoji_id: frame.emoji_id || ""
             });
 
@@ -189,6 +208,8 @@ function AnimationEditor() {
             <Forms.FormTitle>Status Animation Frames</Forms.FormTitle>
             <Forms.FormText style={{ marginBottom: "10px" }}>
                 Configure your animated status frames. Each frame can have text, an emoji name, and an optional custom emoji ID (for Nitro users).
+                <br /><br />
+                <strong>💡 Advanced:</strong> Use <code>eval</code> prefix for dynamic JavaScript content (e.g., <code>eval new Date().toLocaleTimeString()</code>)
             </Forms.FormText>
 
             {frames.map((frame, index) => (
@@ -205,7 +226,7 @@ function AnimationEditor() {
                             <TextInput
                                 value={frame.text}
                                 onChange={(value: string) => updateFrame(index, "text", value)}
-                                placeholder="Status text"
+                                placeholder="Status text (or 'eval ...' for dynamic content)"
                             />
                         </div>
                     </Flex>
@@ -216,7 +237,7 @@ function AnimationEditor() {
                             <TextInput
                                 value={frame.emoji_name}
                                 onChange={(value: string) => updateFrame(index, "emoji_name", value)}
-                                placeholder="😀 or emoji_name"
+                                placeholder="😀 or emoji_name (or 'eval ...')"
                             />
                         </div>
                         <div style={{ flex: 1 }}>
@@ -283,8 +304,8 @@ export default definePlugin({
     name: "AnimatedStatus",
     description: "Animate your Discord custom status with rotating text and emojis",
     authors: [{
-        name: "QuangBlue",
-        id: 0n // Replace with your Discord user ID
+        name: "Quang Blue",
+        id: 439262471765884939n
     }],
     settings,
 
