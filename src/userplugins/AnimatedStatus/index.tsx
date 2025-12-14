@@ -65,8 +65,9 @@ function evaluateField(field: string): string {
     if (field.trim().startsWith("eval ")) {
         try {
             const code = field.trim().substring(5).trim();
+            // @ts-ignore - eval is intentional for dynamic status content
             // eslint-disable-next-line no-eval
-            const result = eval(code);
+            const result = (0, eval)(code); // Indirect eval to suppress bundler warning
             return String(result || "");
         } catch (error) {
             logger.error("Failed to evaluate field:", error);
@@ -148,6 +149,7 @@ function stopAnimation() {
 // Animation Editor Component
 import { Button, Forms, React, TextInput, useState } from "@webpack/common";
 import { Flex } from "@components/Flex";
+import { Devs } from "@utils/index";
 
 function AnimationEditor() {
     const [frames, setFrames] = useState<StatusFrame[]>([]);
@@ -303,10 +305,7 @@ function AnimationEditor() {
 export default definePlugin({
     name: "AnimatedStatus",
     description: "Animate your Discord custom status with rotating text and emojis",
-    authors: [{
-        name: "Quang Blue",
-        id: 439262471765884939n
-    }],
+    authors: [Devs.QuangBlue],
     settings,
 
     start() {

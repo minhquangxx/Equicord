@@ -71,11 +71,11 @@ async function completeQuest() {
         }
 
         // Find required stores
-        const ApplicationStreamingStore = Object.values(wpRequire.c).find(x => x?.exports?.Z?.__proto__?.getStreamerActiveStreamMetadata)?.exports?.Z;
-        const RunningGameStore = Object.values(wpRequire.c).find(x => x?.exports?.ZP?.getRunningGames)?.exports?.ZP;
-        const QuestsStore = Object.values(wpRequire.c).find(x => x?.exports?.Z?.__proto__?.getQuest)?.exports?.Z;
-        const ChannelStore = Object.values(wpRequire.c).find(x => x?.exports?.Z?.__proto__?.getAllThreadsForParent)?.exports?.Z;
-        const GuildChannelStore = Object.values(wpRequire.c).find(x => x?.exports?.ZP?.getSFWDefaultChannel)?.exports?.ZP;
+        const ApplicationStreamingStore = (Object.values(wpRequire.c).find((x: any) => x?.exports?.Z?.__proto__?.getStreamerActiveStreamMetadata) as any)?.exports?.Z;
+        const RunningGameStore = (Object.values(wpRequire.c).find((x: any) => x?.exports?.ZP?.getRunningGames) as any)?.exports?.ZP;
+        const QuestsStore = (Object.values(wpRequire.c).find((x: any) => x?.exports?.Z?.__proto__?.getQuest) as any)?.exports?.Z;
+        const ChannelStore = (Object.values(wpRequire.c).find((x: any) => x?.exports?.Z?.__proto__?.getAllThreadsForParent) as any)?.exports?.Z;
+        const GuildChannelStore = (Object.values(wpRequire.c).find((x: any) => x?.exports?.ZP?.getSFWDefaultChannel) as any)?.exports?.ZP;
 
         if (!QuestsStore) {
             showToast("Failed to find QuestsStore!", Toasts.Type.FAILURE);
@@ -104,9 +104,9 @@ async function completeQuest() {
         const applicationName = quest.config.application.name;
         const questName = quest.config.messages.questName;
         const taskConfig = quest.config.taskConfig ?? quest.config.taskConfigV2;
-        const taskName = ["WATCH_VIDEO", "PLAY_ON_DESKTOP", "STREAM_ON_DESKTOP", "PLAY_ACTIVITY", "WATCH_VIDEO_ON_MOBILE"].find(x => taskConfig.tasks[x] != null);
-        const secondsNeeded = taskConfig.tasks[taskName].target;
-        let secondsDone = quest.userStatus?.progress?.[taskName]?.value ?? 0;
+        const taskName = ["WATCH_VIDEO", "PLAY_ON_DESKTOP", "STREAM_ON_DESKTOP", "PLAY_ACTIVITY", "WATCH_VIDEO_ON_MOBILE"].find(x => taskConfig.tasks[x] != null)!;
+        const secondsNeeded = taskConfig.tasks[taskName!].target;
+        let secondsDone = quest.userStatus?.progress?.[taskName!]?.value ?? 0;
 
         logger.info(`Starting quest: ${questName} (${taskName})`);
 
@@ -241,7 +241,7 @@ async function completeQuest() {
             logger.info("Remember that you need at least 1 other person to be in the vc!");
         } else if (taskName === "PLAY_ACTIVITY") {
             const channelId = ChannelStore.getSortedPrivateChannels()[0]?.id ??
-                Object.values(GuildChannelStore.getAllGuilds()).find(x => x != null && x.VOCAL.length > 0).VOCAL[0].channel.id;
+                (Object.values(GuildChannelStore.getAllGuilds()) as any).find((x: any) => x != null && x.VOCAL?.length > 0)?.VOCAL[0]?.channel?.id;
             const streamKey = `call:${channelId}:1`;
 
             showToast(`Completing quest: ${questName}`, Toasts.Type.MESSAGE);
@@ -301,10 +301,7 @@ function restartIntervalCheck() {
 export default definePlugin({
     name: "AutoCompleteQuest",
     description: "Automatically complete Discord quests",
-    authors: [{
-        name: "Quang Blue",
-        id: 439262471765884939n
-    }],
+    authors: [Devs.QuangBlue],
     settings,
 
     start() {
